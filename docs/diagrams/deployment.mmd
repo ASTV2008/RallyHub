@@ -1,0 +1,10 @@
+flowchart LR
+  H([Host del usuario<br/>puerto 8000]) --> APP
+  subgraph compose["Docker Compose - red privada backend"]
+    APP[contenedor app<br/>python:3.12 slim, usuario no-root<br/>uvicorn 1 worker<br/>entrypoint: wait_for_db → alembic upgrade head → seed opcional]
+    DB[(contenedor db<br/>mariadb:11.4.5<br/>healthcheck)]
+    V[[volumen rallyhub_db]]
+  end
+  APP -->|3306 solo red interna| DB
+  DB --- V
+  DBG([DBeaver, opcional]) -.->|solo 127.0.0.1| DB

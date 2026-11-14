@@ -1,0 +1,26 @@
+[project]
+name = "rallyhub"
+version = "1.0.0"
+description = "RallyHub — gestión para clubes y academias de tenis de mesa"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = [
+    "integration: requiere MariaDB (DATABASE_URL apuntando a una base *_test)",
+]
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = ["B008", "S101", "UP046"]  # B008: Depends() en defaults es el patrón de FastAPI; S101: assert en tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S311"]
+"../scripts/seed.py" = ["S105"]  # contraseñas DEMO documentadas, solo desarrollo
+"app/api/**" = ["B008"]

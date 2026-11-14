@@ -1,0 +1,91 @@
+# RallyHub — ejecución local. Requiere un archivo .env (copia .env.example).
+name: rallyhub
+
+services:
+  db:
+    image: mariadb:11.4.5
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Define DB_ROOT_PASSWORD en .env}
+      MARIADB_DATABASE: ${DB_NAME:-rallyhub}
+      MARIADB_USER: ${DB_USER:-rallyhub}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      MARIADB_AUTO_UPGRADE: "1"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+00:00
+    volumes:
+      - rallyhub_db:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [backend]
+    # Sin "ports": MariaDB NO se publica. Para DBeaver usa compose.db-local.yaml (solo 127.0.0.1).
+
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: runtime
+    image: rallyhub-app:1.0.0
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      SECRET_KEY: ${SECRET_KEY:?Define SECRET_KEY en .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      DOCS_ENABLED: ${DOCS_ENABLED:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: ${DB_NAME:-rallyhub}
+      DB_USER: ${DB_USER:-rallyhub}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TIMEZONE: ${TIMEZONE:-America/Bogota}
+      OPENING_TIME: ${OPENING_TIME:-08:00}
+      CLOSING_TIME: ${CLOSING_TIME:-21:00}
+      RESERVATION_MIN_MINUTES: ${RESERVATION_MIN_MINUTES:-30}
+      RESERVATION_MAX_MINUTES: ${RESERVATION_MAX_MINUTES:-120}
+      RESERVATION_MAX_ADVANCE_DAYS: ${RESERVATION_MAX_ADVANCE_DAYS:-30}
+      CANCEL_MIN_HOURS_BEFORE: ${CANCEL_MIN_HOURS_BEFORE:-2}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-1}
+      SEED_DEMO: ${SEED_DEMO:-0}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    networks: [backend]
+
+  # Pruebas: docker compose --profile test run --rm tests
+  tests:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: dev
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: []
+    command: ["pytest", "-ra", "--cov=app", "--cov-report=term-missing"]
+    environment:
+      ENVIRONMENT: test
+      SECRET_KEY: test-only-secret-key-test-only-secret-key
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: rallyhub_test
+      DB_USER: ${DB_USER:-rallyhub}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks: [backend]
+
+networks:
+  backend:
+
+volumes:
+  rallyhub_db:

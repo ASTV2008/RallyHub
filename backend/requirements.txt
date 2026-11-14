@@ -1,0 +1,13 @@
+# Dependencias directas de ejecución (versiones fijadas). Cada una se justifica en
+# docs/architecture/DECISIONES_ARQUITECTURA.md (sección "Dependencias").
+fastapi==0.115.6            # framework HTTP + OpenAPI
+uvicorn==0.34.0             # servidor ASGI
+pydantic==2.10.4            # validación de contratos
+pydantic-settings==2.7.0    # configuración por variables de entorno
+email-validator==2.2.0      # requerido por EmailStr de Pydantic
+SQLAlchemy==2.0.36          # ORM
+alembic==1.14.0             # migraciones
+PyMySQL==1.1.1              # driver MariaDB en Python puro (sin compilación)
+pwdlib[argon2]==0.2.1       # hash Argon2id
+PyJWT==2.10.1               # JWT de sesión
+tzdata==2024.2              # base de zonas horarias (python:slim no la incluye)

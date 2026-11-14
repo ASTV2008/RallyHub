@@ -1,0 +1,174 @@
+erDiagram
+  audit_logs {
+    int id PK
+    int user_id FK
+    String action
+    String entity
+    int entity_id
+    String detail
+    UTCDateTime created_at
+  }
+  classes {
+    int id PK
+    String name
+    Text description
+    int coach_id FK
+    int table_id FK
+    varchar level
+    Integer capacity
+    UTCDateTime starts_at
+    UTCDateTime ends_at
+    varchar status
+    UTCDateTime created_at
+  }
+  class_enrollments {
+    int id PK
+    int class_id FK
+    int student_id FK
+    varchar status
+    UTCDateTime enrolled_at
+  }
+  attendances {
+    int id PK
+    int enrollment_id FK
+    varchar status
+    String notes
+    int recorded_by FK
+    UTCDateTime recorded_at
+    UTCDateTime updated_at
+  }
+  facilities {
+    int id PK
+    String name
+    String address
+    Text description
+    Boolean is_active
+    UTCDateTime created_at
+  }
+  tables {
+    int id PK
+    int facility_id FK
+    String code
+    String table_type
+    Text description
+    varchar status
+    UTCDateTime created_at
+  }
+  maintenance_blocks {
+    int id PK
+    int table_id FK
+    UTCDateTime starts_at
+    UTCDateTime ends_at
+    String reason
+    int created_by FK
+    UTCDateTime created_at
+  }
+  progress_records {
+    int id PK
+    int student_id FK
+    int coach_id FK
+    Date recorded_on
+    SmallInteger serve
+    SmallInteger receive
+    SmallInteger ball_control
+    SmallInteger movement
+    SmallInteger strategy
+    String notes
+    UTCDateTime created_at
+  }
+  reservations {
+    int id PK
+    int student_id FK
+    int table_id FK
+    UTCDateTime starts_at
+    UTCDateTime ends_at
+    varchar status
+    String notes
+    int created_by FK
+    UTCDateTime created_at
+    UTCDateTime cancelled_at
+  }
+  tournaments {
+    int id PK
+    String name
+    String category
+    varchar modality
+    Date starts_on
+    Date ends_on
+    String location
+    Integer capacity
+    varchar status
+    UTCDateTime created_at
+  }
+  tournament_participants {
+    int id PK
+    int tournament_id FK
+    int student_id FK
+    UTCDateTime registered_at
+  }
+  tournament_matches {
+    int id PK
+    int tournament_id FK
+    String round_name
+    int participant_a_id FK
+    int participant_b_id FK
+    SmallInteger score_a
+    SmallInteger score_b
+    int winner_id FK
+    UTCDateTime created_at
+  }
+  users {
+    int id PK
+    String email
+    String password_hash
+    varchar role
+    Boolean is_active
+    Integer token_version
+    UTCDateTime created_at
+  }
+  students {
+    int id PK
+    int user_id FK
+    String first_name
+    String last_name
+    Date birth_date
+    String phone
+    String guardian_name
+    varchar level
+    Boolean is_active
+    UTCDateTime created_at
+  }
+  coaches {
+    int id PK
+    int user_id FK
+    String first_name
+    String last_name
+    String specialty
+    Text bio
+    String phone
+    Boolean is_active
+    UTCDateTime created_at
+  }
+  class_enrollments ||--|o attendances : "enrollment_id"
+  classes ||--o{ class_enrollments : "class_id"
+  coaches ||--o{ classes : "coach_id"
+  coaches ||--o{ progress_records : "coach_id"
+  facilities ||--o{ tables : "facility_id"
+  students ||--o{ class_enrollments : "student_id"
+  students ||--o{ progress_records : "student_id"
+  students ||--o{ reservations : "student_id"
+  students ||--o{ tournament_participants : "student_id"
+  tables ||--o{ classes : "table_id"
+  tables ||--o{ maintenance_blocks : "table_id"
+  tables ||--o{ reservations : "table_id"
+  tournament_participants ||--o{ tournament_matches : "participant_a_id"
+  tournament_participants ||--o{ tournament_matches : "participant_b_id"
+  tournament_participants ||--o{ tournament_matches : "winner_id"
+  tournaments ||--o{ tournament_matches : "tournament_id"
+  tournaments ||--o{ tournament_participants : "tournament_id"
+  users ||--o{ attendances : "recorded_by"
+  users ||--o{ audit_logs : "user_id"
+  users ||--o{ maintenance_blocks : "created_by"
+  users ||--o{ reservations : "created_by"
+  users ||--|o coaches : "user_id"
+  users ||--|o students : "user_id"

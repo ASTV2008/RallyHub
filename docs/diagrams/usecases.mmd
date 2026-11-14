@@ -1,0 +1,29 @@
+flowchart TB
+  subgraph A[Administrador]
+    direction TB
+    ADM([ADMIN]) --- A1(Gestionar estudiantes y entrenadores)
+    ADM --- A2(Gestionar instalaciones, mesas y mantenimiento)
+    ADM --- A3(Administrar reservas)
+    ADM --- A4(Crear clases e inscribir)
+    ADM --- A5(Corregir asistencia)
+    ADM --- A6(Torneos y resultados)
+    ADM --- A7(Panel, auditoria, exportar CSV)
+  end
+  subgraph C[Entrenador]
+    direction TB
+    CO([COACH]) --- C1(Crear clases)
+    CO --- C2(Registrar asistencia de sus clases)
+    CO --- C3(Registrar progreso)
+    CO --- C4(Consultar horario y panel)
+  end
+  subgraph S[Estudiante]
+    direction TB
+    ST([STUDENT]) --- S1(Consultar disponibilidad)
+    ST --- S2(Reservar y cancelar)
+    ST --- S3(Inscribirse a clases)
+    ST --- S4(Ver su asistencia y progreso)
+    ST --- S5(Inscribirse a torneos)
+    ST --- S6(Editar su perfil)
+  end
+  A ~~~ C
+  C ~~~ S

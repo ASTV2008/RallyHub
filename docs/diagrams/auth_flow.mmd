@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant U as Navegador
+  participant A as /auth/login
+  participant API as Cualquier endpoint
+  U->>A: POST credenciales
+  A->>A: throttle por (IP, correo) y verificación Argon2id
+  A-->>U: Set-Cookie rh_session (HttpOnly, SameSite=Lax) + rh_csrf (legible por JS)
+  U->>API: petición (cookie automática)
+  API->>API: decodificar JWT, cargar usuario, comparar token_version
+  U->>API: escritura + cabecera X-CSRF-Token
+  API->>API: la cabecera debe igualar el claim csrf firmado y el Origin debe ser válido
+  API-->>U: 2xx / 401 / 403
+  U->>API: POST /auth/logout
+  API-->>U: borra cookies (el token expira solo, cambiar clave o desactivar usuario invalida todos)

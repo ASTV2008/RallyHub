@@ -1,0 +1,9 @@
+flowchart LR
+  P[push / pull_request] --> J[job test · ubuntu-latest]
+  J --> M[(servicio MariaDB 11.4.5<br/>healthcheck)]
+  J --> I[pip install requirements-dev.txt]
+  I --> L[ruff check]
+  L --> G[alembic upgrade head<br/>base vacía]
+  G --> T[pytest unit + integración<br/>+ cobertura]
+  T --> A[resumen y artefacto coverage.xml]
+  A -. sin despliegue (CI, no CD) .-> X[ ]

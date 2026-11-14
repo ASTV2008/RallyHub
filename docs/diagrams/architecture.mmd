@@ -1,0 +1,11 @@
+flowchart TB
+  UI[Frontend vanilla JS<br/>static/js: api.js, ui.js, pages/*] --> RT
+  RT[Routers api/v1/endpoints<br/>HTTP, status codes, dependencias] --> DEP[dependencies<br/>autenticación, CSRF, roles]
+  RT --> SV[Servicios<br/>reglas de negocio + transacciones + auditoría]
+  SV --> DM[domain<br/>reglas puras: booking_rules, stats, csv_utils, errors]
+  SV --> RP[Repositorios<br/>consultas y persistencia]
+  RP --> MD[Modelos SQLAlchemy 2.x]
+  MD --> DB[(MariaDB)]
+  SC[Schemas Pydantic v2<br/>contratos de entrada/salida] -.valida.-> RT
+  CORE[core: config, tokens JWT, passwords Argon2id,<br/>ratelimit, logging] -.apoya.-> SV
+  CORE -.apoya.-> DEP

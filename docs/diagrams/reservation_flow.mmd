@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant U as Navegador
+  participant R as Router /reservations
+  participant S as ReservationService
+  participant D as MariaDB (READ COMMITTED)
+  U->>R: POST /api/v1/reservations (cookie + X-CSRF-Token)
+  R->>S: create(actor, datos)
+  S->>S: validar ventana (horario, duración, pasado, antelación)
+  S->>D: SELECT mesa WHERE id=? FOR UPDATE (bloqueo de fila)
+  Note over D: transacciones concurrentes sobre la misma mesa esperan aquí
+  S->>D: estado de mesa/instalación, bloqueos de mantenimiento
+  S->>D: reservas y clases que solapan: new_start < end AND new_end > start
+  alt hay conflicto
+    S-->>U: 409 reservation_conflict (rollback)
+  else libre
+    S->>D: INSERT reserva + auditoría
+    S->>D: COMMIT (libera el bloqueo)
+    S-->>U: 201 Created
+  end

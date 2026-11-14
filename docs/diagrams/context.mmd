@@ -1,0 +1,9 @@
+flowchart LR
+  A([Administrador]) --> B
+  C([Entrenador]) --> B
+  S([Estudiante]) --> B
+  B[Navegador<br/>HTML + CSS + JS] -->|HTTPS/HTTP mismo origen<br/>/api/v1 + cookie HttpOnly| R
+  subgraph RallyHub
+    R[Aplicación FastAPI<br/>API REST + archivos estáticos]
+  end
+  R -->|SQLAlchemy / PyMySQL| D[(MariaDB 11.4<br/>InnoDB, utf8mb4)]

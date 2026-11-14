@@ -1,0 +1,6 @@
+# Opcional: publica MariaDB SOLO en 127.0.0.1 (p. ej. para DBeaver).
+#   docker compose -f compose.yaml -f compose.db-local.yaml up -d
+services:
+  db:
+    ports:
+      - "127.0.0.1:3306:3306"
