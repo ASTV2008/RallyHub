@@ -56,7 +56,7 @@ export async function render(box, { role, me }) {
     const book = async (t, s, e) => {
       if (!(await confirmDialog(`¿Reservar la mesa ${t.code} (${t.facility_name}) el ${fmtRange(s, e)}?`, { okLabel: 'Reservar' }))) return;
       try {
-        await post('/reservations', { table_id: t.id, starts_at: s, ends_at: e, ...(admin ? { student_id: Number(who.value) } : {}) });
+        await post('/reservations', { table_id: t.table_id, starts_at: s, ends_at: e, ...(admin ? { student_id: Number(who.value) } : {}) });
         toast('Reserva confirmada.', 'ok'); search();
       } catch (er) { fail(er); if (er.status === 409) search(); }
     };
