@@ -88,7 +88,21 @@ export function toast(msg, type = 'info') {
 }
 /** Error con mensaje apto para mostrar al usuario (validaciones locales, acciones canceladas). */
 export class UserError extends Error {}
-export const errMsg = (e) => (e instanceof ApiError || e instanceof UserError ? e.message : 'Ocurrió un error inesperado.');
+export const errMsg = (e) => {
+  if (e instanceof ApiError) {
+    const details = e.errors
+      ?.map((item) => `${item.field}: ${item.message}`)
+      .join(' | ');
+
+    return details
+      ? `${e.message} (${details})`
+      : e.message;
+  }
+
+  return e instanceof UserError
+    ? e.message
+    : 'Ocurrió un error inesperado.';
+};
 export const fail = (e) => toast(errMsg(e), 'err');
 
 // ---- diálogos accesibles (<dialog> nativo: foco atrapado, Esc cierra) --------------------------------
